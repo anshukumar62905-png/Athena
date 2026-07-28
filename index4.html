@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="libApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athena - Premium Library System</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"></script>
+
+    <style>
+        :root {
+            --bg-base: #f0f4f8;
+            --surface: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --primary: #4f46e5;
+            --primary-light: #e0e7ff;
+            --primary-grad: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --danger: #f43f5e;
+            --danger-bg: #ffe4e6;
+            --success: #10b981;
+            --success-bg: #d1fae5;
+            --warning: #f59e0b;
+            --warning-bg: #fef3c7;
+            --border: rgba(226, 232, 240, 0.8);
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --radius-md: 16px;
+            --radius-lg: 24px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            background-image:
+                radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 0.03) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 0.03) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 0.03) 0, transparent 50%);
+            color: var(--text-dark);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--surface);
+            display: flex;
+            flex-direction: column;
+            margin: 1rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .brand {
+            padding: 2.5rem 2rem;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+            background-image: var(--primary-grad);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            padding: 0 1.5rem;
+            gap: 0.5rem;
+        }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 1.1rem 1.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.05rem;
+            border-radius: 14px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-grad);
+            opacity: 0;
+            transition: opacity 0.4s;
+            z-index: -1;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: white;
+            transform: translateX(5px);
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+        }
+
+        .nav-links a:hover::before,
+        .nav-links a.active::before {
+            opacity: 1;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 2rem;
+            background: linear-gradient(to top, rgba(248, 250, 252, 1), transparent);
+        }
+
+        .pro-card {
+            background: var(--primary-grad);
+            padding: 1.5rem;
+            border-radius: 16px;
+            color: white;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+        }
+
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .topbar {
+            padding: 1.5rem 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-container {
+            background: var(--surface);
+            padding: 0.85rem 1.5rem;
+            border-radius: 50px;
+            width: 350px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            transition: 0.3s;
+        }
+
+        .search-container:focus-within {
+            box-shadow: 0 0 0 3px var(--primary-light);
+            border-color: var(--primary);
+        }
+
+        .search-container input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 100%;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .icon-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .icon-btn:hover {
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: var(--surface);
+            padding: 0.5rem 0.5rem 0.5rem 1.5rem;
+            border-radius: 50px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-grad);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+
+        .content-area {
+            padding: 0 2.5rem 2.5rem 2.5rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .page-header {
+            margin-bottom: 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .page-title {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -1px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            padding: 1.8rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 100px;
+            height: 100px;
+            background: var(--primary-grad);
+            border-radius: 50%;
+            opacity: 0.1;
+            filter: blur(20px);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .panel {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .panel-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .form-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.8rem;
+            align-items: end;
+        }
+
+        .input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-wrapper label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .custom-input {
+            padding: 1rem 1.2rem;
+            border: 2px solid var(--border);
+            background: var(--bg-base);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            outline: none;
+            color: var(--text-dark);
+        }
+
+        .custom-input:focus {
+            border-color: var(--primary);
+            background: var(--surface);
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .btn-gradient {
+            background: var(--primary-grad);
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-gradient:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 20px -3px rgba(79, 70, 229, 0.4);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--surface);
+        }
+
+        th {
+            background: #f8fafc;
+            padding: 1.2rem 1.5rem;
+            text-align: left;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+            transition: background 0.2s;
+        }
+
+        tr:hover td {
+            background: #f8fafc;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .book-cell {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .book-cover {
+            width: 45px;
+            height: 60px;
+            border-radius: 6px;
+            background: var(--primary-grad);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .book-details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .book-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+        }
+
+        .book-author {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .badge-pill {
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .theme-success {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .theme-warning {
+            background: var(--warning-bg);
+            color: var(--warning);
+        }
+
+        .theme-danger {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        .theme-primary {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-grad);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.1rem;
+        }
+
+        .btn-return {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .btn-return:hover {
+            background: var(--success);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .btn-delete {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        .btn-delete:hover {
+            background: var(--danger);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .magic-button {
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+
+            animation: smoothColorShift 4s infinite linear;
+            transition: transform 0.2s;
+        }
+
+        .magic-button:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body ng-controller="MainController">
+
+    <aside class="sidebar">
+        <div class="brand">
+            <i class="fa-solid fa-book-sparkles"></i> Athena
+        </div>
+
+        <nav class="nav-links">
+            <a href="#!/dashboard" ng-class="{active: currentPath == '/dashboard'}">
+                <i class="fa-solid fa-border-all"></i> Insight Hub
+            </a>
+            <a href="#!/catalog" ng-class="{active: currentPath == '/catalog'}">
+                <i class="fa-solid fa-layer-group"></i> Master Catalog
+            </a>
+            <a href="#!/desk" ng-class="{active: currentPath == '/desk'}">
+                <i class="fa-solid fa-arrow-right-arrow-left"></i> Issue Desk
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="pro-card">
+                <i class="fa-solid fa-crown" style="font-size: 1.5rem; margin-bottom: 10px;"></i>
+                <h4 style="margin-bottom: 5px;">Athena Pro</h4>
+                <p style="font-size: 0.85rem; opacity: 0.9;">System is fully updated.</p>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="topbar">
+            <div class="search-container">
+                <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted);"></i>
+                <input type="text" placeholder="Search ISBN, Titles, or Members...">
+            </div>
+
+            <div class="topbar-actions">
+                <button class="icon-btn"><i class="fa-regular fa-bell"></i></button>
+                <div class="user-profile">
+                    <div style="text-align: right;">
+                        <div style="font-weight: 700; font-size: 0.95rem;">Anshu Admin</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">Chief Librarian
+                        </div>
+                    </div>
+                    <div class="avatar">AN</div>
+                </div>
+            </div>
+        </header>
+
+        <main class="content-area">
+            <div class="page-header">
+                <div>
+                    <div
+                        style="color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">
+                        Workspace</div>
+                    <h1 class="page-title">{{pageTitle}}</h1>
+                </div>
+            </div>
+
+            <div ng-view class="view-container"></div>
+        </main>
+    </div>
+
+    <script type="text/ng-template" id="dashboard.html">
+        <div class="grid-4">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-label">Total Assets</div>
+                    <div class="stat-icon theme-primary"><i class="fa-solid fa-books"></i></div>
+                </div>
+                <div class="stat-value">{{db.length}}</div>
+                <div style="font-size: 0.85rem; color: var(--success); font-weight: 600;">
+                    <i class="fa-solid fa-arrow-trend-up"></i> +12 this month
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-label">Available</div>
+                    <div class="stat-icon theme-success"><i class="fa-solid fa-circle-check"></i></div>
+                </div>
+                <div class="stat-value">{{calcAvailable()}}</div>
+                <div class="progress-container">
+                    <div class="progress-fill" style="width: {{ (calcAvailable() / calcTotal()) * 100 }}%"></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-label">Issued Out</div>
+                    <div class="stat-icon theme-warning"><i class="fa-solid fa-book-open-reader"></i></div>
+                </div>
+                <div class="stat-value">{{activeIssues.length}}</div>
+                <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
+                    Currently in circulation
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-label">Overdue</div>
+                    <div class="stat-icon theme-danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                </div>
+                <div class="stat-value">{{calcOverdue()}}</div>
+                <div style="font-size: 0.85rem; color: var(--danger); font-weight: 600;">
+                    Requires immediate action
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <h3 class="panel-title">Live Circulation Feed</h3>
+                <button class="btn btn-gradient" style="padding: 0.6rem 1.2rem; font-size: 0.9rem;">View All</button>
+            </div>
+            
+            <div class="table-responsive" ng-if="activeIssues.length > 0">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Transaction</th>
+                            <th>Asset Info</th>
+                            <th>Borrower</th>
+                            <th>Timeline</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="issue in activeIssues | limitTo: 4">
+                            <td>
+                                <span style="font-family: monospace; font-weight: 700; color: var(--primary);">#TRX-{{issue.id}}</span>
+                            </td>
+                            <td>
+                                <div class="book-cell">
+                                    <div class="book-details">
+                                        <span class="book-title">{{issue.bookTitle}}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="font-weight: 700;">{{issue.studentName}}</div>
+                                <div style="font-size: 0.85rem; color: var(--text-muted);">ID: {{issue.studentId}}</div>
+                            </td>
+                            <td>
+                                <div style="font-size: 0.9rem; font-weight: 600;">Due: {{issue.due | date:'MMM dd, yyyy'}}</div>
+                            </td>
+                            <td>
+                                <span class="badge-pill" ng-class="checkOverdue(issue.due) ? 'theme-danger' : 'theme-warning'">
+                                    <i class="fa-solid" ng-class="checkOverdue(issue.due) ? 'fa-circle-xmark' : 'fa-clock'"></i>
+                                    {{checkOverdue(issue.due) ? 'Overdue' : 'Active'}}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div ng-if="activeIssues.length === 0" style="text-align: center; padding: 3rem; color: var(--text-muted); font-weight: 600;">
+                No active circulation records at this moment.
+            </div>
+        </div>
+    </script>
+
+    <script type="text/ng-template" id="catalog.html">
+        <div class="panel">
+            <h3 class="panel-title" style="margin-bottom: 1.5rem;">Register New Asset</h3>
+            <form class="form-layout" ng-submit="addNewBook()">
+                <div class="input-wrapper">
+                    <label>Book Title</label>
+                    <input type="text" class="custom-input" ng-model="newBook.title" required>
+                </div>
+                <div class="input-wrapper">
+                    <label>Author Name</label>
+                    <input type="text" class="custom-input" ng-model="newBook.author" required>
+                </div>
+                <div class="input-wrapper">
+                    <label>ISBN Identifier</label>
+                    <input type="text" class="custom-input" ng-model="newBook.isbn" required>
+                </div>
+                <div class="input-wrapper">
+                    <label>Initial Stock</label>
+                    <input type="number" class="custom-input" ng-model="newBook.qty" required min="1">
+                </div>
+                <button type="submit" class="btn btn-gradient" style="height: 52px;">
+                    <i class="fa-solid fa-plus"></i> Add Asset
+                </button>
+            </form>
+        </div>
+
+        <div class="panel">
+            <h3 class="panel-title" style="margin-bottom: 1.5rem;">Library Database</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Book Details</th>
+                            <th>ISBN</th>
+                            <th>Stock Status</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="b in db">
+                            <td>
+                                <div class="book-cell">
+                                    <div class="book-cover">
+                                        <i class="fa-solid fa-book-open"></i>
+                                    </div>
+                                    <div class="book-details">
+                                        <span class="book-title">{{b.title}}</span>
+                                        <span class="book-author">By {{b.author}}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span style="font-family: monospace; font-weight: 600; color: var(--text-muted);">{{b.isbn}}</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span style="font-weight: 800; font-size: 1.2rem;" ng-style="{color: b.available > 0 ? 'var(--success)' : 'var(--danger)'}">
+                                        {{b.available}}
+                                    </span>
+                                    <span style="color: var(--text-muted); font-weight: 600; font-size: 0.9rem;">/ {{b.total}}</span>
+                                </div>
+                                <div class="progress-container" style="width: 100px; height: 6px;">
+                                    <div class="progress-fill" style="width: {{ (b.available / b.total) * 100 }}%;" ng-style="{background: b.available > 0 ? 'var(--success)' : 'var(--danger)'}"></div>
+                                </div>
+                            </td>
+                            <td style="text-align: right;">
+                                <button class="action-btn btn-delete" ng-click="deleteBook(b.id)" title="Remove Book">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/ng-template" id="desk.html">
+        <div class="panel">
+            <h3 class="panel-title" style="margin-bottom: 1.5rem;">Issue Terminal</h3>
+            <form class="form-layout" ng-submit="processIssue()">
+                <div class="input-wrapper">
+                    <label>Select Title to Issue</label>
+                    <select class="custom-input" ng-model="issue.bookId" required>
+                        <option value="" disabled selected>-- Scan or Select Asset --</option>
+                        <option ng-repeat="b in db" value="{{b.id}}" ng-disabled="b.available === 0">
+                            {{b.title}} ({{b.available}} in stock)
+                        </option>
+                    </select>
+                </div>
+                <div class="input-wrapper">
+                    <label>Borrower Name</label>
+                    <input type="text" class="custom-input" ng-model="issue.name" required>
+                </div>
+                <div class="input-wrapper">
+                    <label>Membership ID</label>
+                    <input type="text" class="custom-input" ng-model="issue.memId" required>
+                </div>
+                <button type="submit" class="btn btn-gradient" style="height: 52px;">
+                    <i class="fa-solid fa-right-from-bracket"></i> Process Issue
+                </button>
+            </form>
+        </div>
+
+        <div class="panel">
+            <h3 class="panel-title" style="margin-bottom: 1.5rem;">Return Terminal & Log</h3>
+            <div class="table-responsive">
+                <table ng-if="activeIssues.length > 0">
+                    <thead>
+                        <tr>
+                            <th>Book Title</th>
+                            <th>Borrower Details</th>
+                            <th>Due Status</th>
+                            <th style="text-align: right;">Process</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="record in activeIssues">
+                            <td>
+                                <div class="book-title" style="color: var(--primary);">{{record.bookTitle}}</div>
+                                <div style="font-family: monospace; font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">TRX-{{record.id}}</div>
+                            </td>
+                            <td>
+                                <div style="font-weight: 700;">{{record.studentName}}</div>
+                                <div style="font-size: 0.85rem; color: var(--text-muted);">{{record.studentId}}</div>
+                            </td>
+                            <td>
+                                <span class="badge-pill" ng-class="checkOverdue(record.due) ? 'theme-danger' : 'theme-success'">
+                                    {{checkOverdue(record.due) ? 'Penalty Applied' : 'Clear'}}
+                                </span>
+                                <div style="font-size: 0.85rem; margin-top: 5px; font-weight: 600;" ng-style="{color: checkOverdue(record.due) ? 'var(--danger)' : 'var(--text-muted)'}">
+                                    Due: {{record.due | date:'MMM dd, yyyy'}}
+                                </div>
+                            </td>
+                            <td style="text-align: right;">
+                                <button class="btn btn-return" style="padding: 0.6rem 1.2rem; border-radius: 10px;" ng-click="processReturn(record)">
+                                    <i class="fa-solid fa-right-to-bracket"></i> Return
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div ng-if="activeIssues.length === 0" style="text-align: center; padding: 3rem; color: var(--text-muted); font-weight: 600;">
+                    Terminal clear. All assets have been returned.
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script>
+        var app = angular.module("libApp", ["ngRoute"]);
+
+        app.config(function ($routeProvider) {
+            $routeProvider
+                .when("/dashboard", { templateUrl: "dashboard.html", title: "Analytics Overview" })
+                .when("/catalog", { templateUrl: "catalog.html", title: "Asset Inventory" })
+                .when("/desk", { templateUrl: "desk.html", title: "Circulation Control" })
+                .otherwise({ redirectTo: "/dashboard" });
+        });
+
+        app.controller("MainController", function ($scope, $rootScope, $location) {
+
+            $rootScope.$on('$routeChangeSuccess', function (event, current) {
+                $scope.pageTitle = current.$$route ? current.$$route.title : 'Athena';
+                $scope.currentPath = $location.path();
+            });
+
+            $scope.db = [
+                { id: 101, title: "Designing Data-Intensive Applications", author: "Martin Kleppmann", isbn: "978-1449373320", total: 5, available: 3 },
+                { id: 102, title: "Refactoring: Improving the Design", author: "Martin Fowler", isbn: "978-0134757599", total: 3, available: 3 },
+                { id: 103, title: "Introduction to Algorithms", author: "Thomas H. Cormen", isbn: "978-0262033848", total: 4, available: 0 },
+                { id: 104, title: "Design Patterns", author: "Erich Gamma", isbn: "978-0201633610", total: 6, available: 5 }
+            ];
+
+            var pastDate = new Date();
+            pastDate.setDate(pastDate.getDate() - 16);
+
+            var futureDate1 = new Date();
+            futureDate1.setDate(futureDate1.getDate() + 5);
+
+            var futureDate2 = new Date();
+            futureDate2.setDate(futureDate2.getDate() + 10);
+
+            $scope.activeIssues = [
+                { id: 54930, bookId: 101, bookTitle: "Designing Data-Intensive Applications", studentName: "Michael Chang", studentId: "CS-992", issue: new Date(), due: futureDate1 },
+                { id: 54931, bookId: 103, bookTitle: "Introduction to Algorithms", studentName: "Sarah Jenkins", studentId: "CS-104", issue: pastDate, due: new Date(pastDate.getTime() + 14 * 24 * 60 * 60 * 1000) },
+                { id: 54932, bookId: 104, bookTitle: "Design Patterns", studentName: "Emma Watson", studentId: "CS-881", issue: new Date(), due: futureDate2 }
+            ];
+
+            $scope.calcTotal = function () {
+                return $scope.db.reduce(function (acc, b) { return acc + b.total; }, 0);
+            };
+
+            $scope.calcAvailable = function () {
+                return $scope.db.reduce(function (acc, b) { return acc + b.available; }, 0);
+            };
+
+            $scope.checkOverdue = function (due) {
+                return new Date() > new Date(due);
+            };
+
+            $scope.calcOverdue = function () {
+                return $scope.activeIssues.filter(function (i) { return $scope.checkOverdue(i.due); }).length;
+            };
+
+            $scope.newBook = {};
+            $scope.addNewBook = function () {
+                var newId = $scope.db.length > 0 ? Math.max.apply(Math, $scope.db.map(function (b) { return b.id; })) + 1 : 101;
+                $scope.db.push({
+                    id: newId,
+                    title: $scope.newBook.title,
+                    author: $scope.newBook.author,
+                    isbn: $scope.newBook.isbn,
+                    total: $scope.newBook.qty,
+                    available: $scope.newBook.qty
+                });
+                $scope.newBook = {};
+            };
+
+            $scope.deleteBook = function (id) {
+                var isIssued = $scope.activeIssues.some(function (i) { return i.bookId === id; });
+                if (isIssued) {
+                    alert("System Lock: Asset currently in circulation.");
+                    return;
+                }
+                $scope.db = $scope.db.filter(function (b) { return b.id !== id; });
+            };
+
+            $scope.issue = {};
+            $scope.processIssue = function () {
+                var book = $scope.db.find(function (b) { return b.id == $scope.issue.bookId; });
+                if (book && book.available > 0) {
+                    book.available--;
+                    var now = new Date();
+                    var due = new Date();
+                    due.setDate(now.getDate() + 14);
+
+                    $scope.activeIssues.push({
+                        id: Math.floor(Math.random() * 90000) + 10000,
+                        bookId: book.id,
+                        bookTitle: book.title,
+                        studentName: $scope.issue.name,
+                        studentId: $scope.issue.memId,
+                        issue: now,
+                        due: due
+                    });
+                    $scope.issue = {};
+                }
+            };
+
+            $scope.processReturn = function (record) {
+                var book = $scope.db.find(function (b) { return b.id === record.bookId; });
+                if (book) { book.available++; }
+                $scope.activeIssues = $scope.activeIssues.filter(function (i) { return i.id !== record.id; });
+            };
+        });
+    </script>
+</body>
+
+</html>
